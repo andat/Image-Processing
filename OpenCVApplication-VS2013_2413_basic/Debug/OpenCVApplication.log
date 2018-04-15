@@ -1,0 +1,46 @@
+﻿  OpenCVApplication.cpp
+c:\users\zenbookx\documents\facultate\an iii\sem ii\ip\opencvapplication-vs2013_2413_basic\opencvapplication-vs2013_2413_basic\opencvapplication.cpp(329): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+c:\users\zenbookx\documents\facultate\an iii\sem ii\ip\opencvapplication-vs2013_2413_basic\opencvapplication-vs2013_2413_basic\opencvapplication.cpp(330): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+c:\users\zenbookx\documents\facultate\an iii\sem ii\ip\opencvapplication-vs2013_2413_basic\opencvapplication-vs2013_2413_basic\opencvapplication.cpp(439): warning C4244: '=': conversion from 'float' to 'uchar', possible loss of data
+c:\users\zenbookx\documents\facultate\an iii\sem ii\ip\opencvapplication-vs2013_2413_basic\opencvapplication-vs2013_2413_basic\opencvapplication.cpp(440): warning C4244: '=': conversion from 'float' to 'uchar', possible loss of data
+c:\users\zenbookx\documents\facultate\an iii\sem ii\ip\opencvapplication-vs2013_2413_basic\opencvapplication-vs2013_2413_basic\opencvapplication.cpp(441): warning C4244: '=': conversion from 'float' to 'uchar', possible loss of data
+c:\users\zenbookx\documents\facultate\an iii\sem ii\ip\opencvapplication-vs2013_2413_basic\opencvapplication-vs2013_2413_basic\opencvapplication.cpp(520): warning C4244: 'return': conversion from 'double' to 'int', possible loss of data
+c:\users\zenbookx\documents\facultate\an iii\sem ii\ip\opencvapplication-vs2013_2413_basic\opencvapplication-vs2013_2413_basic\opencvapplication.cpp(524): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\zenbookx\documents\facultate\an iii\sem ii\ip\opencvapplication-vs2013_2413_basic\opencvapplication-vs2013_2413_basic\opencvapplication.cpp(525): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+c:\users\zenbookx\documents\facultate\an iii\sem ii\ip\opencvapplication-vs2013_2413_basic\opencvapplication-vs2013_2413_basic\opencvapplication.cpp(576): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+c:\users\zenbookx\documents\facultate\an iii\sem ii\ip\opencvapplication-vs2013_2413_basic\opencvapplication-vs2013_2413_basic\opencvapplication.cpp(577): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+c:\users\zenbookx\documents\facultate\an iii\sem ii\ip\opencvapplication-vs2013_2413_basic\opencvapplication-vs2013_2413_basic\opencvapplication.cpp(958): warning C4018: '<': signed/unsigned mismatch
+c:\users\zenbookx\documents\facultate\an iii\sem ii\ip\opencvapplication-vs2013_2413_basic\opencvapplication-vs2013_2413_basic\opencvapplication.cpp(1250): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
+c:\users\zenbookx\documents\facultate\an iii\sem ii\ip\opencvapplication-vs2013_2413_basic\opencvapplication-vs2013_2413_basic\opencvapplication.cpp(1255): warning C4244: 'return': conversion from 'double' to 'int', possible loss of data
+c:\users\zenbookx\documents\facultate\an iii\sem ii\ip\opencvapplication-vs2013_2413_basic\opencvapplication-vs2013_2413_basic\opencvapplication.cpp(1314): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+c:\users\zenbookx\documents\facultate\an iii\sem ii\ip\opencvapplication-vs2013_2413_basic\opencvapplication-vs2013_2413_basic\opencvapplication.cpp(1325): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+c:\users\zenbookx\documents\facultate\an iii\sem ii\ip\opencvapplication-vs2013_2413_basic\opencvapplication-vs2013_2413_basic\opencvapplication.cpp(1418): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+c:\users\zenbookx\documents\facultate\an iii\sem ii\ip\opencvapplication-vs2013_2413_basic\opencvapplication-vs2013_2413_basic\opencvapplication.cpp(1459): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\zenbookx\documents\facultate\an iii\sem ii\ip\opencvapplication-vs2013_2413_basic\opencvapplication-vs2013_2413_basic\opencvapplication.cpp(1466): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+c:\users\zenbookx\documents\facultate\an iii\sem ii\ip\opencvapplication-vs2013_2413_basic\opencvapplication-vs2013_2413_basic\opencvapplication.cpp(1644): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\zenbookx\documents\facultate\an iii\sem ii\ip\opencvapplication-vs2013_2413_basic\opencvapplication-vs2013_2413_basic\opencvapplication.cpp(477): warning C4172: returning address of local variable or temporary: center
+c:\users\zenbookx\documents\facultate\an iii\sem ii\ip\opencvapplication-vs2013_2413_basic\opencvapplication-vs2013_2413_basic\opencvapplication.cpp(839): warning C4715: 'getStartPoint': not all control paths return a value
+c:\users\zenbookx\documents\facultate\an iii\sem ii\ip\opencvapplication-vs2013_2413_basic\opencvapplication-vs2013_2413_basic\opencvapplication.cpp(864): warning C4715: 'getPixelAtDir': not all control paths return a value
+c:\users\zenbookx\documents\facultate\an iii\sem ii\ip\opencvapplication-vs2013_2413_basic\opencvapplication-vs2013_2413_basic\opencvapplication.cpp(1283): warning C4172: returning address of local variable or temporary: hist
+  OpenCVApplication.vcxproj -> C:\Users\zenbookx\Documents\Facultate\An III\Sem II\IP\OpenCVApplication-VS2013_2413_basic\OpenCVApplication-VS2013_2413_basic\Debug\OpenCVApplication.exe
+  OpenCVApplication.vcxproj -> C:\Users\zenbookx\Documents\Facultate\An III\Sem II\IP\OpenCVApplication-VS2013_2413_basic\OpenCVApplication-VS2013_2413_basic\Debug\OpenCVApplication.pdb (Full PDB)
+  OpenCV\dll\Debug\opencv_calib3d2413d.dll
+  OpenCV\dll\Debug\opencv_contrib2413d.dll
+  OpenCV\dll\Debug\opencv_core2413d.dll
+  OpenCV\dll\Debug\opencv_features2d2413d.dll
+  OpenCV\dll\Debug\opencv_ffmpeg2413.dll
+  OpenCV\dll\Debug\opencv_flann2413d.dll
+  OpenCV\dll\Debug\opencv_gpu2413d.dll
+  OpenCV\dll\Debug\opencv_highgui2413d.dll
+  OpenCV\dll\Debug\opencv_imgproc2413d.dll
+  OpenCV\dll\Debug\opencv_legacy2413d.dll
+  OpenCV\dll\Debug\opencv_ml2413d.dll
+  OpenCV\dll\Debug\opencv_nonfree2413d.dll
+  OpenCV\dll\Debug\opencv_objdetect2413d.dll
+  OpenCV\dll\Debug\opencv_ocl2413d.dll
+  OpenCV\dll\Debug\opencv_photo2413d.dll
+  OpenCV\dll\Debug\opencv_stitching2413d.dll
+  OpenCV\dll\Debug\opencv_superres2413d.dll
+  OpenCV\dll\Debug\opencv_video2413d.dll
+  OpenCV\dll\Debug\opencv_videostab2413d.dll
+         19 file(s) copied.
