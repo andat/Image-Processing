@@ -1474,7 +1474,7 @@ void histogram_normalization() {
 	}
 }
 
-int main()
+int main1()
 {
 	int op, n;
 	do
