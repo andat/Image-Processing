@@ -8,6 +8,7 @@
 #include <random>
 #include <fstream>
 
+using namespace std;
 
 void testOpenImage()
 {
@@ -1474,7 +1475,348 @@ void histogram_normalization() {
 	}
 }
 
-int main1()
+void convolution(Mat_<float> &filter, Mat_<uchar> &img, Mat_<uchar> &output) {
+
+	output.create(img.size());
+	memcpy(output.data, img.data, img.rows * img.cols * sizeof(uchar));
+
+	//img.copyTo(output);
+
+	float scalingCoeff = 1;
+	float additionFactor = 0;
+
+	//TODO: decide if the filter is low pass or high pass and compute the scaling coefficient and the addition factor
+	// low pass if all elements >= 0
+	// high pass has elements < 0
+	bool lowPass = true;
+	for (int i = 0; i < filter.rows; i++)
+		for (int j = 0; j < filter.cols; j++) {
+			if (filter.at<float>(i, j) < 0)
+				//is high pass
+				lowPass = false;
+		}
+
+	// compute scaling coefficient and addition factor for low pass and high pass
+	// low pass: additionFactor = 0, scalingCoeff = sum of all elements
+	// high pass: formula 9.20
+	if (lowPass == true) {
+		additionFactor = 0;
+		scalingCoeff = 0;
+		for (int i = 0; i < filter.rows; i++)
+			for (int j = 0; j < filter.cols; j++) {
+				scalingCoeff += filter.at<float>(i, j);
+			}
+	}
+	else {
+		float posSum = 0, negSum = 0;
+		for (int i = 0; i < filter.rows; i++)
+			for (int j = 0; j < filter.cols; j++) {
+				if (filter.at<int>(i, j) > 0)
+					posSum += filter.at<float>(i, j);
+				else
+					negSum += filter.at<float>(i, j);
+			}
+
+		scalingCoeff = 2 * max(posSum, abs(negSum));
+		additionFactor = 255 / 2;
+	}
+
+	 //TODO: implement convolution operation (formula 9.2)
+	// do not forget to divide with the scaling factor and add the addition factor in order to have values between [0, 255]
+	int k = (filter.rows - 1)/ 2;
+	for(int i = k; i < img.rows - k; i ++)
+		for (int j = k; j < img.cols - k; j++) {
+			int val = 0;
+				
+			for (int u = 0; u < filter.rows; u++)
+				for (int v = 0; v < filter.cols; v++)
+					val += filter.at<float>(u, v) * img.at<uchar>(i + u - k, j + v - k);
+	
+			output.at<uchar>(i, j) = val / scalingCoeff + additionFactor;
+		}
+}
+
+void convolution2(Mat_<float> &filter, Mat_<uchar> &img, Mat_<int> &output) {
+
+		output.create(img.size());
+		memcpy(output.data, img.data, img.rows * img.cols * sizeof(uchar));
+
+		//img.copyTo(output);
+
+		float scalingCoeff = 1;
+		float additionFactor = 0;
+
+		//TODO: decide if the filter is low pass or high pass and compute the scaling coefficient and the addition factor
+		// low pass if all elements >= 0
+		// high pass has elements < 0
+		bool lowPass = true;
+		for (int i = 0; i < filter.rows; i++)
+			for (int j = 0; j < filter.cols; j++) {
+				if (filter.at<float>(i, j) < 0)
+					//is high pass
+					lowPass = false;
+			}
+
+		// compute scaling coefficient and addition factor for low pass and high pass
+		// low pass: additionFactor = 0, scalingCoeff = sum of all elements
+		// high pass: formula 9.20
+		if (lowPass == true) {
+			additionFactor = 0;
+			scalingCoeff = 0;
+			for (int i = 0; i < filter.rows; i++)
+				for (int j = 0; j < filter.cols; j++) {
+					scalingCoeff += filter.at<float>(i, j);
+				}
+		}
+		else {
+			float posSum = 0, negSum = 0;
+			for (int i = 0; i < filter.rows; i++)
+				for (int j = 0; j < filter.cols; j++) {
+					if (filter.at<int>(i, j) > 0)
+						posSum += filter.at<float>(i, j);
+					else
+						negSum += filter.at<float>(i, j);
+				}
+
+			scalingCoeff = 2 * max(posSum, abs(negSum));
+			additionFactor = 255 / 2;
+		}
+
+		// TODO: implement convolution operation (formula 9.2)
+		// do not forget to divide with the scaling factor and add the addition factor in order to have values between [0, 255]
+		int k = (filter.rows - 1) / 2;
+		for (int i = k; i < img.rows - k; i++)
+			for (int j = k; j < img.cols - k; j++) {
+				float val = 0;
+
+				for (int u = 0; u < filter.rows; u++)
+					for (int v = 0; v < filter.cols; v++)
+						val += filter.at<float>(u, v) * img.at<uchar>(i + u - k, j + v - k);
+
+				output.at<int>(i, j) = val;
+			}
+	}
+
+void median_filter(int w) {
+	char fname[MAX_PATH];
+	if (openFileDlg(fname))
+	{
+		Mat img = imread(fname, CV_LOAD_IMAGE_GRAYSCALE);
+		imshow("original image", img);
+
+		Mat copy;
+		img.copyTo(copy);
+
+		int k = w / 2;
+		for (int i = k; i < img.rows - k; i++)
+			for (int j = k; j < img.cols - k; j++) {
+				vector<uchar> intensities;
+				for(int u = 0; u < w; u++)
+					for(int v = 0; v < w; v++)
+						intensities.push_back(img.at<uchar>(i + u - k, j + v - k));
+
+				//sort vector
+				std::sort(intensities.begin(), intensities.end());
+
+				int middle = intensities.size() / 2;
+				copy.at<uchar>(i, j) = intensities.at(middle);
+			}
+		
+		imshow("filtered", copy);
+		waitKey(0);
+	}
+}
+
+void gaussian_filter(int w) {
+	char fname[MAX_PATH];
+	if (openFileDlg(fname))
+	{
+		Mat_<uchar> img = imread(fname, CV_LOAD_IMAGE_GRAYSCALE);
+		imshow("original image", img);
+
+		Mat_<uchar> copy;
+		img.copyTo(copy);
+
+		float std_dev = w / 6.0;
+		//int k = w / 2;
+
+		Mat_<float> filter(w, w, CV_32FC1);
+		int x0 = (w - 1) / 2;
+		int y0 = (w - 1) / 2;
+		for (int i = 0; i < w; i++)
+			for (int j = 0; j < w; j++) {
+				filter.at<float>(i, j) = (1 / (2 * PI * std_dev * std_dev)) * exp(-1 * (pow(i - x0, 2) + pow(j - y0, 2)) / (2 * std_dev * std_dev));
+			}
+
+		convolution(filter, img, copy);
+		imshow("gaussian filter", copy);
+		waitKey(0);
+	}
+}
+
+void gaussian_filter_separated(int w) {
+		char fname[MAX_PATH];
+		if (openFileDlg(fname))
+		{
+			Mat_<uchar> img = imread(fname, CV_LOAD_IMAGE_GRAYSCALE);
+			imshow("original image", img);
+
+			Mat_<uchar> copy;
+			img.copyTo(copy);
+
+			Mat_<uchar> aux;
+			img.copyTo(aux);
+
+			float std_dev = w / 6.0;
+			//int k = w / 2;
+
+			Mat_<float> gx(w, w, CV_32FC1);
+			Mat_<float> gy(w, w, CV_32FC1);
+
+			for (int u = 0; u < w; u++)
+				for (int v = 0; v < w; v++) {
+					gx(u, v) = 0;
+					gy(u, v) = 0;
+				}
+
+			int x0 = (w - 1) / 2;
+			int y0 = (w - 1) / 2;
+
+			for (int i = 0; i < w; i++)
+				for (int j = 0; j < w; j++) {
+					gx(i, j) = (1 / (2 * PI * std_dev * std_dev)) * exp((-1 * pow(i - x0, 2)) / (2 * std_dev * std_dev));
+					gy(i, j) = (1 / (2 * PI * std_dev * std_dev)) * exp((-1 * pow(j - y0, 2)) / (2 * std_dev * std_dev));
+				}
+
+			convolution(gx, img, copy);
+			convolution(gy, copy, aux);
+			imshow("gaussian filter", aux);
+			waitKey(0);
+		}
+}
+
+vector<Mat_<int>> sobel_gradient(Mat_<uchar> img) {
+	Mat_<int> gradx, grady;
+
+	Mat_<float> sobelX = (Mat_<double>(3, 3) << -1, 0, 1, -2, 0, 2, -1, 0, 1);
+	Mat_<float> sobelY = (Mat_<double>(3, 3) << 1, 2, 1, 0, 0, 0, -1, -2, -1);
+
+	convolution2(sobelX, img, gradx);
+	convolution2(sobelY, img, grady);
+
+	vector<Mat_<int>> res;
+	res.push_back(gradx);
+	res.push_back(grady);
+	return res;
+}
+
+void compute_gradient() {
+	char fname[MAX_PATH];
+	if (openFileDlg(fname))
+	{
+		Mat_<uchar> img = imread(fname, CV_LOAD_IMAGE_GRAYSCALE);
+		Mat_<uchar> gradx, grady;
+
+		Mat_<float> sobelX = (Mat_<double>(3, 3) << -1, 0, 1, -2, 0, 2, -1, 0, 1);
+		Mat_<float> sobelY = (Mat_<double>(3, 3) << 1, 2, 1, 0, 0, 0, -1, -2, -1);
+
+		convolution(sobelX, img, gradx);
+		convolution(sobelY, img, grady);
+
+
+		imshow("grad x", gradx);
+		imshow("grad y", grady);
+		waitKey(0);
+	}
+}
+
+int get_quantization(double angle) {
+	if (angle > 15 * PI / 8 || angle < PI / 8 || (angle > 7 * PI / 8 && angle < 9 * PI / 8))
+		//case 2
+		return 2;
+	else if ((angle > PI / 8 && angle < 3 * PI / 8) || (angle > 9 * PI / 8 && angle < 11 * PI / 8))
+		return 1;
+	else if ((angle > 3 * PI / 8 && angle < 5 * PI / 8) || (angle > 11 * PI / 8 && angle < 13 * PI / 8))
+		return 0;
+	else
+		return 3;
+}
+
+Mat edges() {
+	char fname[MAX_PATH];
+	if (openFileDlg(fname))
+	{
+		Mat_<uchar> img = imread(fname, CV_LOAD_IMAGE_GRAYSCALE);
+		Mat_<uchar> orientation = Mat(img.rows, img.cols, CV_8UC1);
+		Mat_<uchar> magnitude = Mat(img.rows, img.cols, CV_8UC1);
+		Mat_<uchar> dest = Mat(img.rows, img.cols, CV_8UC1);
+
+		vector<Mat_<int>> res = sobel_gradient(img);
+		Mat_<int> gradx = res[0];
+		Mat_<int> grady = res[1];
+		// compute magnitude
+		for(int i = 0; i< img.rows; i++)
+			for (int j = 0; j < img.cols; j++)
+			{
+				int gx = gradx.at<int>(i, j);
+				int gy = grady.at<int>(i, j);
+				magnitude.at<uchar>(i, j) = sqrt(gx * gx + gy * gy) / (4*sqrt(2));
+				double angle = atan2(gy, gx);
+				if (angle < 0)
+					angle += 2 * PI;
+				//quantization
+				orientation.at<uchar>(i, j) = get_quantization(angle);
+				//std::cout << angle << " ";
+			}
+
+		imshow("magnitude", magnitude);
+
+		//gradient suppression
+		for (int r = 1; r < img.rows - 1; r++)
+			for (int c = 1; c < img.cols - 1; c++)
+			{
+				dest[r][c] = 0;
+				switch (orientation[r][c]) {
+				case 0:
+					if (magnitude[r][c] > magnitude[r+1][c] && magnitude[r][c] > magnitude[r-1][c])
+						dest[r][c] = magnitude[r][c];
+					break;
+				case 1:
+					if (magnitude[r][c] > magnitude[r - 1][c + 1] && magnitude[r][c] > magnitude[r + 1][c - 1])
+						dest[r][c] = magnitude[r][c];
+					break;
+				case 2:
+					if (magnitude[r][c] > magnitude[r][c-1] && magnitude[r][c] > magnitude[r][c+1])
+						dest[r][c] = magnitude[r][c];
+					break;
+				case 3:
+					if (magnitude[r][c] > magnitude[r + 1][c + 1] && magnitude[r][c] > magnitude[r - 1][c - 1])
+						dest[r][c] = magnitude[r][c];
+					break;
+				}
+			}
+		imshow("edges", dest);
+		waitKey(0);
+		return dest;
+	}
+}
+
+void adaptive_thresholding(int percent) {
+	Mat img = edges();
+	int hist[256] = {};
+	int m = img.rows * img.cols;
+
+	for (int i = 0; i < img.rows; i++)
+		for (int j = 0; j < img.cols; j++) {
+			int val = img.at<uchar>(i, j);
+			hist[val] ++;
+		}
+
+	int sum = 0;
+
+}
+
+int main()
 {
 	int op, n;
 	do
@@ -1520,6 +1862,12 @@ int main1()
 		printf(" 36 - Histogram stretch and shrink\n");
 		printf(" 37 - Histogram gamma correction\n");
 		printf(" 38 - Histogram equalization\n");
+		printf(" 39 - Mean filter\n");
+		printf(" 40 - 2D gaussian filter\n");
+		printf(" 41 - Separated gaussian filter\n");
+		printf(" 42 - Compute gradient\n");
+		printf(" 43 - Edges\n");
+		printf(" 44 - Edges with thresholding\n");
 		printf(" 0 - Exit\n\n");
 		printf("Option: ");
 		scanf("%d",&op);
@@ -1657,6 +2005,30 @@ int main1()
 				break;
 			case 38:
 				histogram_normalization();
+				break;
+			case 39:
+				std::cout << "Enter dimension\n";
+				int w;
+				std::cin >> w;
+				median_filter(w);
+				break;
+			case 40:
+				std::cout << "Enter dimension\n";
+				int dim;
+				std::cin >> dim;
+				gaussian_filter(dim);
+				break;
+			case 41:
+				std::cout << "Enter dimension\n";
+				int x;
+				std::cin >> x;
+				gaussian_filter_separated(x);
+				break;
+			case 42:
+				compute_gradient();
+				break;
+			case 43:
+				edges();
 				break;
 		}
 	}

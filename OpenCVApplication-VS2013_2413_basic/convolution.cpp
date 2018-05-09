@@ -7,67 +7,67 @@ using namespace std;
 using namespace cv;
 
 
-void convolution(Mat_<int> &filter, Mat_<uchar> &img, Mat_<uchar> &output) {
-
-	output.create(img.size());
-	memcpy(output.data, img.data, img.rows * img.cols * sizeof(uchar));
-
-	//img.copyTo(output);
-
-	int scalingCoeff = 1;
-	int additionFactor = 0;
-
-	//TODO: decide if the filter is low pass or high pass and compute the scaling coefficient and the addition factor
-	// low pass if all elements >= 0
-	// high pass has elements < 0
-	bool lowPass = true;
-	for(int i = 0; i< filter.rows; i++)
-		for (int j = 0; j < filter.cols; j++) {
-			if (filter.at<int>(i, j) < 0)
-				//is high pass
-				lowPass = false;
-		}
-
-	// compute scaling coefficient and addition factor for low pass and high pass
-	// low pass: additionFactor = 0, scalingCoeff = sum of all elements
-	// high pass: formula 9.20
-	if (lowPass == true) {
-		additionFactor = 0;
-		scalingCoeff = 0;
-		for (int i = 0; i< filter.rows; i++)
-			for (int j = 0; j < filter.cols; j++) {
-				scalingCoeff += filter.at<int>(i, j);
-			}
-	}
-	else {
-		int posSum = 0, negSum = 0;
-		for (int i = 0; i< filter.rows; i++)
-			for (int j = 0; j < filter.cols; j++) {
-				if (filter.at<int>(i, j) > 0)
-					posSum += filter.at<int>(i, j);
-				else
-					negSum += filter.at<int>(i, j);
-			}
-
-		scalingCoeff = 2 * std::max(posSum, negSum);
-		additionFactor = 255 / 2;
-	}
-
-
-	// TODO: implement convolution operation (formula 9.2)
-	// do not forget to divide with the scaling factor and add the addition factor in order to have values between [0, 255]
-	int k = (filter.rows - 1)/ 2;
-	for(int i = k; i < img.rows - k; i ++)
-		for (int j = k; j < img.cols - k; j++) {
-			int val = 0;
-			
-			for (int u = 0; u < filter.rows; u++)
-				for (int v = 0; v < filter.cols; v++)
-					val += filter.at<int>(u, v) * img.at<uchar>(i + u - k, j + v - k);
-
-			output.at<uchar>(i, j) = val / scalingCoeff + additionFactor;
-		}
-}
+//void convolution(Mat_<int> &filter, Mat_<uchar> &img, Mat_<uchar> &output) {
+//
+//	output.create(img.size());
+//	memcpy(output.data, img.data, img.rows * img.cols * sizeof(uchar));
+//
+//	//img.copyTo(output);
+//
+//	int scalingCoeff = 1;
+//	int additionFactor = 0;
+//
+//	//TODO: decide if the filter is low pass or high pass and compute the scaling coefficient and the addition factor
+//	// low pass if all elements >= 0
+//	// high pass has elements < 0
+//	bool lowPass = true;
+//	for(int i = 0; i< filter.rows; i++)
+//		for (int j = 0; j < filter.cols; j++) {
+//			if (filter.at<int>(i, j) < 0)
+//				//is high pass
+//				lowPass = false;
+//		}
+//
+//	// compute scaling coefficient and addition factor for low pass and high pass
+//	// low pass: additionFactor = 0, scalingCoeff = sum of all elements
+//	// high pass: formula 9.20
+//	if (lowPass == true) {
+//		additionFactor = 0;
+//		scalingCoeff = 0;
+//		for (int i = 0; i< filter.rows; i++)
+//			for (int j = 0; j < filter.cols; j++) {
+//				scalingCoeff += filter.at<int>(i, j);
+//			}
+//	}
+//	else {
+//		int posSum = 0, negSum = 0;
+//		for (int i = 0; i< filter.rows; i++)
+//			for (int j = 0; j < filter.cols; j++) {
+//				if (filter.at<int>(i, j) > 0)
+//					posSum += filter.at<int>(i, j);
+//				else
+//					negSum += filter.at<int>(i, j);
+//			}
+//
+//		scalingCoeff = 2 * std::max(posSum, negSum);
+//		additionFactor = 255 / 2;
+//	}
+//
+//
+//	// TODO: implement convolution operation (formula 9.2)
+//	// do not forget to divide with the scaling factor and add the addition factor in order to have values between [0, 255]
+//	int k = (filter.rows - 1)/ 2;
+//	for(int i = k; i < img.rows - k; i ++)
+//		for (int j = k; j < img.cols - k; j++) {
+//			int val = 0;
+//			
+//			for (int u = 0; u < filter.rows; u++)
+//				for (int v = 0; v < filter.cols; v++)
+//					val += filter.at<int>(u, v) * img.at<uchar>(i + u - k, j + v - k);
+//
+//			output.at<uchar>(i, j) = val / scalingCoeff + additionFactor;
+//		}
+//}
 
 
 /*  in the frequency domain, the process of convolution simplifies to multiplication => faster than in the spatial domain
@@ -188,66 +188,66 @@ Mat generic_frequency_domain_filter(Mat src, int option)
 	return dst;
 }
 
-int main() {
+int main1() {
 
 
-	// PART 1: convolution in the spatial domain
-	Mat_<uchar> img = imread("Images/cameraman.bmp", CV_LOAD_IMAGE_GRAYSCALE);
-	Mat_<uchar> outputImage;
+	//// PART 1: convolution in the spatial domain
+	//Mat_<uchar> img = imread("Images/cameraman.bmp", CV_LOAD_IMAGE_GRAYSCALE);
+	//Mat_<uchar> outputImage;
 
-	// LOW PASS
-	// mean filter 5x5
-	int meanFilterData5x5[25];
-	fill_n(meanFilterData5x5, 25, 1);
-	Mat_<int> meanFilter5x5(5, 5, meanFilterData5x5);
+	//// LOW PASS
+	//// mean filter 5x5
+	//int meanFilterData5x5[25];
+	//fill_n(meanFilterData5x5, 25, 1);
+	//Mat_<int> meanFilter5x5(5, 5, meanFilterData5x5);
 
-	// mean filter 3x3
-	Mat_<int> meanFilter3x3(3, 3, meanFilterData5x5);
+	//// mean filter 3x3
+	//Mat_<int> meanFilter3x3(3, 3, meanFilterData5x5);
 
-	// gaussian filter
-	int gaussianFilterData[9] = { 1, 2, 1, 2, 4, 2, 1, 2, 1 };
-	Mat_<int> gaussianFilter(3, 3, gaussianFilterData);
+	//// gaussian filter
+	//int gaussianFilterData[9] = { 1, 2, 1, 2, 4, 2, 1, 2, 1 };
+	//Mat_<int> gaussianFilter(3, 3, gaussianFilterData);
 
-	// HIGH PASS
-	// laplace filter 3x3
-	int laplaceFilterData[9] = { -1, -1, -1, -1, 8, -1, -1, -1, -1 };
-	Mat_<int> laplaceFilter(3, 3, laplaceFilterData);
+	//// HIGH PASS
+	//// laplace filter 3x3
+	//int laplaceFilterData[9] = { -1, -1, -1, -1, 8, -1, -1, -1, -1 };
+	//Mat_<int> laplaceFilter(3, 3, laplaceFilterData);
 
-	int highpassFilterData[9] = { -1, -1, -1, -1, 9, -1, -1, -1, -1 };
-	Mat_<int> highpassFilter(3, 3, highpassFilterData);
+	//int highpassFilterData[9] = { -1, -1, -1, -1, 9, -1, -1, -1, -1 };
+	//Mat_<int> highpassFilter(3, 3, highpassFilterData);
 
-	imshow("original", img);
-	//TODO: convolution with the mean filter 5 x 5
-	convolution(meanFilter5x5, img, outputImage);
-	imshow("5x5", outputImage);
-	//TODO: convolution with the mean filter 3 x 3
-	convolution(meanFilter3x3, img, outputImage);
-	imshow("3x3", outputImage);
-	//TODO: convolution with the gaussian filter
-	convolution(gaussianFilter, img, outputImage);
-	imshow("gaussian", outputImage);
-	//TODO: convolution with the laplacian filter
-	convolution(laplaceFilter, img, outputImage);
-	imshow("laplace", outputImage);
-	//TODO: convolution with the highpass filter
-	convolution(highpassFilter, img, outputImage);
-	imshow("highpass", outputImage);
-	waitKey(0);
-
-
-	// PART 2: convolution in the frequency domain
-
-	// TODO: convolution with the ideal low pass filter (formula 9.16) take R^2 = 20
-	imshow("ideal low pass", generic_frequency_domain_filter(img, 0));
+	//imshow("original", img);
+	////TODO: convolution with the mean filter 5 x 5
+	//convolution(meanFilter5x5, img, outputImage);
+	//imshow("5x5", outputImage);
+	////TODO: convolution with the mean filter 3 x 3
+	//convolution(meanFilter3x3, img, outputImage);
+	//imshow("3x3", outputImage);
+	////TODO: convolution with the gaussian filter
+	//convolution(gaussianFilter, img, outputImage);
+	//imshow("gaussian", outputImage);
+	////TODO: convolution with the laplacian filter
+	//convolution(laplaceFilter, img, outputImage);
+	//imshow("laplace", outputImage);
+	////TODO: convolution with the highpass filter
+	//convolution(highpassFilter, img, outputImage);
+	//imshow("highpass", outputImage);
 	//waitKey(0);
-	// TODO: convolution with the ideal high pass filter (formula 9.17) take R^2 = 20
-	imshow("ideal high pass", generic_frequency_domain_filter(img, 1));
+
+
+	//// PART 2: convolution in the frequency domain
+
+	//// TODO: convolution with the ideal low pass filter (formula 9.16) take R^2 = 20
+	//imshow("ideal low pass", generic_frequency_domain_filter(img, 0));
+	////waitKey(0);
+	//// TODO: convolution with the ideal high pass filter (formula 9.17) take R^2 = 20
+	//imshow("ideal high pass", generic_frequency_domain_filter(img, 1));
+	////waitKey(0);
+	//// TODO: convolution with the Gaussian low pass filter (formula 9.18) take A = 10
+	//imshow("gaussian low pass", generic_frequency_domain_filter(img, 2));
+	////waitKey(0);
+	//// TODO: convolution with the Gaussian high pass filter (formula 9.19) take A = 10
+	//imshow("gaussian high pass", generic_frequency_domain_filter(img, 3));
 	//waitKey(0);
-	// TODO: convolution with the Gaussian low pass filter (formula 9.18) take A = 10
-	imshow("gaussian low pass", generic_frequency_domain_filter(img, 2));
-	//waitKey(0);
-	// TODO: convolution with the Gaussian high pass filter (formula 9.19) take A = 10
-	imshow("gaussian high pass", generic_frequency_domain_filter(img, 3));
-	waitKey(0);
 	return 0;
 }
