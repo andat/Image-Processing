@@ -735,6 +735,7 @@ void label_BFS() {
 				std::queue<Point2i> q;
 				labels.at<uchar>(i, j) = label;
 				q.push(Point2i(i, j));
+
 				while (!q.empty()) {
 					Point2i el = (Point2i)q.front();
 					q.pop();
@@ -1731,18 +1732,106 @@ void compute_gradient() {
 }
 
 int get_quantization(double angle) {
-	if (angle > 15 * PI / 8 || angle < PI / 8 || (angle > 7 * PI / 8 && angle < 9 * PI / 8))
+	if (angle >= 15 * PI / 8 || angle < PI / 8 || (angle > 7 * PI / 8 && angle <= 9 * PI / 8))
 		//case 2
 		return 2;
-	else if ((angle > PI / 8 && angle < 3 * PI / 8) || (angle > 9 * PI / 8 && angle < 11 * PI / 8))
+	else if ((angle >= PI / 8 && angle <= 3 * PI / 8) || (angle > 9 * PI / 8 && angle <= 11 * PI / 8))
 		return 1;
-	else if ((angle > 3 * PI / 8 && angle < 5 * PI / 8) || (angle > 11 * PI / 8 && angle < 13 * PI / 8))
+	else if ((angle > 3 * PI / 8 && angle < 5 * PI / 8) || (angle >= 11 * PI / 8 && angle < 13 * PI / 8))
 		return 0;
 	else
 		return 3;
 }
 
-Mat edges() {
+Mat adaptive_thresholding(float percent, Mat img) {
+	int hist[256] = {};
+
+	for (int i = 0; i < img.rows; i++)
+		for (int j = 0; j < img.cols; j++) {
+			int val = img.at<uchar>(i, j);
+			hist[val] ++;
+		}
+
+	int sum = 0;
+	int tHigh;
+	int noEdgePixels = (1 - percent) * ((img.rows - 2) * (img.cols - 2) - hist[0]);
+	for (int i = 1; i < 256; i++) {
+		sum += hist[i];
+		if (sum > noEdgePixels) {
+			tHigh = i;
+			std::cout << tHigh;
+			break;
+		}
+	}
+	int tLow = 0.4 * tHigh;
+
+	//threshold image
+	Mat copy;
+	img.copyTo(copy);
+
+	for (int i = 0; i < copy.rows; i++)
+		for (int j = 0; j < copy.cols; j++) {
+			if (img.at<uchar>(i, j) >= tHigh)
+				copy.at<uchar>(i, j) = 255;
+			else if (img.at<uchar>(i, j) < tLow)
+				copy.at<uchar>(i, j) = 0;
+			else
+				copy.at<uchar>(i, j) = 128;
+		}
+
+	return copy;
+}
+
+Mat edge_extension(Mat img) {
+	/*Mat copy;
+	img.copyTo(copy);*/
+
+	Mat labels(img.rows, img.cols, CV_8UC1);
+	for (int i = 0; i < img.rows; i++) {
+		for (int j = 0; j < img.cols; j++) {
+			labels.at<uchar>(i, j) = 0;
+		}
+	}
+	
+	bool first = false;
+	int label = 1;
+	for (int i = 1; i < img.rows - 1; i++)
+		for (int j = 1; j < img.cols - 1; j++) {
+			if (img.at<uchar>(i, j) == 255 && labels.at<uchar>(i, j) == 0) {
+				//label++;
+				std::queue<Point2i> q;
+				labels.at<uchar>(i, j) = label;
+				q.push(Point2i(i, j));
+
+				while (!q.empty()) {
+					Point2i el = (Point2i)q.front();
+					q.pop();
+					vector<Point2i> neigh = getNeighbours8(img.rows, img.cols, el);
+					for (Point2i n : neigh) {
+						int in = n.x;
+						int jn = n.y;
+						if (img.at<uchar>(in, jn) == 128) {
+							img.at<uchar>(in, jn) = 255;
+							labels.at<uchar>(in, jn) = label;
+							q.push(n);
+						}
+					}
+				}
+			}
+		}
+
+	Mat copy;
+	img.copyTo(copy); 
+	for (int i = 0; i < img.rows - 1; i++)
+		for (int j = 0; j < img.cols - 1; j++) {
+			if (copy.at<uchar>(i, j) == 128)
+				copy.at<uchar>(i, j) = 0;
+		}
+
+	return copy;
+}
+
+void edges() {
 	char fname[MAX_PATH];
 	if (openFileDlg(fname))
 	{
@@ -1778,43 +1867,34 @@ Mat edges() {
 				dest[r][c] = 0;
 				switch (orientation[r][c]) {
 				case 0:
-					if (magnitude[r][c] > magnitude[r+1][c] && magnitude[r][c] > magnitude[r-1][c])
+					if (magnitude[r][c] >= magnitude[r+1][c] && magnitude[r][c] >= magnitude[r-1][c])
 						dest[r][c] = magnitude[r][c];
 					break;
 				case 1:
-					if (magnitude[r][c] > magnitude[r - 1][c + 1] && magnitude[r][c] > magnitude[r + 1][c - 1])
+					if (magnitude[r][c] >= magnitude[r - 1][c + 1] && magnitude[r][c] >= magnitude[r + 1][c - 1])
 						dest[r][c] = magnitude[r][c];
 					break;
 				case 2:
-					if (magnitude[r][c] > magnitude[r][c-1] && magnitude[r][c] > magnitude[r][c+1])
+					if (magnitude[r][c] >= magnitude[r][c-1] && magnitude[r][c] >= magnitude[r][c+1])
 						dest[r][c] = magnitude[r][c];
 					break;
 				case 3:
-					if (magnitude[r][c] > magnitude[r + 1][c + 1] && magnitude[r][c] > magnitude[r - 1][c - 1])
+					if (magnitude[r][c] >= magnitude[r + 1][c + 1] && magnitude[r][c] >= magnitude[r - 1][c - 1])
 						dest[r][c] = magnitude[r][c];
 					break;
 				}
 			}
 		imshow("edges", dest);
+
+		Mat thresh = adaptive_thresholding(0.1, dest);
+		imshow("thresholded", thresh);
+
+		//remove weak edges
+		imshow("final", edge_extension(thresh));
 		waitKey(0);
-		return dest;
 	}
 }
 
-void adaptive_thresholding(int percent) {
-	Mat img = edges();
-	int hist[256] = {};
-	int m = img.rows * img.cols;
-
-	for (int i = 0; i < img.rows; i++)
-		for (int j = 0; j < img.cols; j++) {
-			int val = img.at<uchar>(i, j);
-			hist[val] ++;
-		}
-
-	int sum = 0;
-
-}
 
 int main()
 {
@@ -2030,6 +2110,9 @@ int main()
 			case 43:
 				edges();
 				break;
+			/*case 44:
+				adaptive_thresholding(0.1);
+				break;*/
 		}
 	}
 	while (op!=0);
